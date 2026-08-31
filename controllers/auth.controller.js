@@ -1,7 +1,9 @@
 const { registerUser } = require("../services/auth.service");
 
-const register = async (req, res) => {
+const register = async (req, res, next) => {
+
     try {
+
         const { name, email, password } = req.body;
 
         const user = await registerUser({
@@ -20,17 +22,9 @@ const register = async (req, res) => {
         });
 
     } catch (error) {
-        console.error("Registration error:", error);
 
-        if (error.message === "EMAIL_ALREADY_EXISTS") {
-            return res.status(409).json({
-                message: "Email is already registered"
-            });
-        }
+        next(error);
 
-        res.status(500).json({
-            message: "Internal server error"
-        });
     }
 };
 

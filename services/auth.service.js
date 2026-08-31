@@ -1,13 +1,18 @@
 const bcrypt = require("bcrypt");
 const { User } = require("../models");
+const AppError = require("../utils/appError");
 
 const registerUser = async ({ name, email, password }) => {
+
     const existingUser = await User.findOne({
         where: { email }
     });
 
     if (existingUser) {
-        throw new Error("EMAIL_ALREADY_EXISTS");
+        throw new AppError(
+            "Email is already registered",
+            409
+        );
     }
 
     const hashedPassword = await bcrypt.hash(password, 12);
