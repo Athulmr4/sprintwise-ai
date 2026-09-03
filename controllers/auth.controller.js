@@ -29,9 +29,7 @@ const register = async (req, res, next) => {
 };
 
 const login = async (req, res, next) => {
-
     try {
-
         const { email, password } = req.body;
 
         const { user, token } = await loginUser({
@@ -39,20 +37,23 @@ const login = async (req, res, next) => {
             password
         });
 
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "lax",
+            maxAge: 24 * 60 * 60 * 1000
+        });
+
         res.status(200).json({
             message: "Login successful",
-            token,
             user: {
                 id: user.id,
                 name: user.name,
                 email: user.email
             }
         });
-
     } catch (error) {
-
         next(error);
-
     }
 };
 
