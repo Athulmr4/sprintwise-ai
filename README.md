@@ -167,32 +167,63 @@ The final provider will be selected during the AI implementation phase.
 
 ## 🏗️ Architecture
 
-SprintWise AI follows a layered backend architecture.
 
-```text
-Client
-  │
-  ▼
-Express Routes
-  │
-  ▼
-Middleware
-  │
-  ├── Authentication
-  ├── Authorization
-  └── Validation
-  │
-  ▼
-Controllers
-  │
-  ▼
-Services
-  │
-  ├── Business Logic
-  └── AI Services
-  │
-  ▼
-Sequelize ORM
-  │
-  ▼
-MySQL
+## Architecture
+
+SprintWise AI follows a layered backend architecture designed to keep
+business logic, HTTP handling, database access, validation, and AI services
+separated.
+
+                        ┌──────────────────────┐
+                        │      Client/UI       │
+                        │ HTML • EJS • JS      │
+                        │ Tailwind CSS         │
+                        └──────────┬───────────┘
+                                   │
+                                   ▼
+                        ┌──────────────────────┐
+                        │   Express.js Routes  │
+                        │ Auth • User • Project│
+                        │ Task • AI APIs       │
+                        └──────────┬───────────┘
+                                   │
+                                   ▼
+                        ┌──────────────────────┐
+                        │    Middleware Layer  │
+                        │ Authentication       │
+                        │ Validation           │
+                        │ Error Handling       │
+                        │ Security             │
+                        └──────────┬───────────┘
+                                   │
+                                   ▼
+                        ┌──────────────────────┐
+                        │    Controllers       │
+                        │ HTTP Request/Response│
+                        │ Handling             │
+                        └──────────┬───────────┘
+                                   │
+                                   ▼
+                        ┌──────────────────────┐
+                        │      Services        │
+                        │ Business Logic       │
+                        │ Auth • Projects      │
+                        │ Tasks • AI Workflows │
+                        └───────┬────────┬─────┘
+                                │        │
+                   ┌────────────┘        └──────────────┐
+                   ▼                                    ▼
+          ┌──────────────────┐                ┌──────────────────┐
+          │ Sequelize /      │                │   AI Services    │
+          │ Data Access      │                │ LLM APIs         │
+          └────────┬─────────┘                │ Prompts          │
+                   │                          │ Validation       │
+                   ▼                          │ AI Workflows     │
+          ┌──────────────────┐                └──────────────────┘
+          │     MySQL        │
+          │ Users            │
+          │ Workspaces       │
+          │ Projects         │
+          │ Tasks            │
+          │ Activity         │
+          └──────────────────┘
