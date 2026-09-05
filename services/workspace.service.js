@@ -31,6 +31,84 @@ const createWorkspace = async ({ name, description, ownerId }) => {
     }
 };
 
+const getUserWorkspaces = async (userId) => {
+    const memberships = await WorkspaceMember.findAll({
+        where: {
+            user_id: userId
+        },
+        include: [
+            {
+                association: "workspace",
+                attributes: [
+                    "id",
+                    "name",
+                    "description",
+                    "owner_id",
+                    "created_at",
+                    "updated_at"
+                ]
+            }
+        ],
+        order: [["joined_at", "DESC"]]
+    });
+
+    return memberships;
+};
+
+const getWorkspaceById = async (workspaceId, userId) => {
+    const membership = await WorkspaceMember.findOne({
+        where: {
+            workspace_id: workspaceId,
+            user_id: userId
+        },
+        include: [
+            {
+                association: "workspace",
+                attributes: [
+                    "id",
+                    "name",
+                    "description",
+                    "owner_id",
+                    "created_at",
+                    "updated_at"
+                ]
+            }
+        ]
+    });
+
+    if (!membership) {
+        return null;
+    }
+
+    return membership;
+};
+
+const updateWorkspace = async (
+    workspaceId,
+    { name, description }
+) => {
+    const workspace = await Workspace.findByPk(workspaceId);
+
+    if (!workspace) {
+        return null;
+    }
+
+    if (name !== undefined) {
+        workspace.name = name;
+    }
+
+    if (description !== undefined) {
+        workspace.description = description;
+    }
+
+    await workspace.save();
+
+    return workspace;
+};
+
 module.exports = {
-    createWorkspace
+    createWorkspace,
+    getUserWorkspaces,
+    getWorkspaceById,
+    updateWorkspace
 };
