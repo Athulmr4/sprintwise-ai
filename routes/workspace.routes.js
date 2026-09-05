@@ -1,10 +1,11 @@
 const express = require("express");
 const authenticate = require("../middleware/auth.middleware");
 const validate = require("../middleware/validation.middleware");
-const { create, getAll, getOne, update } = require("../controllers/workspace.controller");
+const { create, getAll, getOne, update,remove } = require("../controllers/workspace.controller");
 const { createWorkspaceValidator, updateWorkspaceValidator } = require("../validators/workspace.validator");
 const {
-    requireWorkspaceAdmin
+    requireWorkspaceAdmin,
+    requireWorkspaceOwner
 } = require("../middleware/workspace.middleware");
 
 
@@ -29,6 +30,13 @@ router.patch(
     updateWorkspaceValidator,
     validate,
     update
+);
+
+router.delete(
+    "/:id",
+    authenticate,
+    requireWorkspaceOwner,
+    remove
 );
 
 module.exports = router;

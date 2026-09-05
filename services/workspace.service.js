@@ -106,9 +106,22 @@ const updateWorkspace = async (
     return workspace;
 };
 
+const deleteWorkspace = async (workspaceId) => {
+    const workspace = await Workspace.findByPk(workspaceId);
+
+    if (!workspace) {
+        return null;
+    }
+
+    await workspace.destroy();
+
+    return workspace;
+};
+
 module.exports = {
     createWorkspace,
     getUserWorkspaces,
     getWorkspaceById,
-    updateWorkspace
+    updateWorkspace,
+    deleteWorkspace
 };

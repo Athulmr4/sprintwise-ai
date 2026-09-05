@@ -1,4 +1,10 @@
-const { createWorkspace, getUserWorkspaces, getWorkspaceById,updateWorkspace } = require("../services/workspace.service");
+const {
+    createWorkspace,
+    getUserWorkspaces,
+    getWorkspaceById,
+    updateWorkspace,
+    deleteWorkspace
+} = require("../services/workspace.service");
 
 const create = async (req, res, next) => {
     try {
@@ -105,9 +111,28 @@ const update = async (req, res, next) => {
     }
 };
 
+const remove = async (req, res, next) => {
+    try {
+        const workspace = await deleteWorkspace(req.params.id);
+
+        if (!workspace) {
+            return res.status(404).json({
+                message: "Workspace not found"
+            });
+        }
+
+        res.status(200).json({
+            message: "Workspace deleted successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     create,
     getAll,
     getOne,
-    update
+    update,
+    remove
 };
