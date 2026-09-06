@@ -1,8 +1,8 @@
 const express = require("express");
 const authenticate = require("../middleware/auth.middleware");
 const validate = require("../middleware/validation.middleware");
-const { create, getAll, getOne, update,remove } = require("../controllers/workspace.controller");
-const { createWorkspaceValidator, updateWorkspaceValidator } = require("../validators/workspace.validator");
+const { create, getAll, getOne, update,remove,addMember } = require("../controllers/workspace.controller");
+const { createWorkspaceValidator, updateWorkspaceValidator,addMemberValidator } = require("../validators/workspace.validator");
 const {
     requireWorkspaceAdmin,
     requireWorkspaceOwner
@@ -37,6 +37,15 @@ router.delete(
     authenticate,
     requireWorkspaceOwner,
     remove
+);
+
+router.post(
+    "/:id/members",
+    authenticate,
+    requireWorkspaceAdmin,
+    addMemberValidator,
+    validate,
+    addMember
 );
 
 module.exports = router;

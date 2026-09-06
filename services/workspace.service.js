@@ -1,4 +1,5 @@
-const { Workspace, WorkspaceMember } = require("../models");
+const { Workspace, WorkspaceMember, User } = require("../models");
+const AppError = require("../utils/appError");
 
 const createWorkspace = async ({ name, description, ownerId }) => {
     const transaction = await Workspace.sequelize.transaction();
@@ -118,10 +119,49 @@ const deleteWorkspace = async (workspaceId) => {
     return workspace;
 };
 
+const addWorkspaceMember = async ({
+    workspaceId,
+    email,
+    role = "member"
+}) => {
+    const user = await User.findOne({
+        where: {
+            email
+        }
+    });
+
+    if (!user) {
+        throw new AppError("User not found", 404);
+    }
+
+    const existingMembership = await WorkspaceMember.findOne({
+        where: {
+            workspace_id: workspaceId,
+            user_id: user.id
+        }
+    });
+
+    if (existingMembership) {
+        throw new AppError(
+            "User is already a member of this workspace",
+            409
+        );
+    }
+
+    const membership = await WorkspaceMember.create({
+        workspace_id: workspaceId,
+        user_id: user.id,
+        role
+    });
+
+    return membership;
+};
+
 module.exports = {
     createWorkspace,
     getUserWorkspaces,
     getWorkspaceById,
     updateWorkspace,
-    deleteWorkspace
+    deleteWorkspace,
+    addWorkspaceMember
 };

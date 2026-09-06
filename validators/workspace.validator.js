@@ -31,7 +31,23 @@ const updateWorkspaceValidator = [
         .withMessage("Workspace description must not exceed 1000 characters")
 ];
 
+const addMemberValidator = [
+    body("email")
+        .trim()
+        .notEmpty()
+        .withMessage("Member email is required")
+        .isEmail()
+        .withMessage("Please provide a valid email address")
+        .normalizeEmail(),
+
+    body("role")
+        .optional()
+        .isIn(["admin", "member"])
+        .withMessage("Role must be either admin or member")
+];
+
 module.exports = {
     createWorkspaceValidator,
-    updateWorkspaceValidator
+    updateWorkspaceValidator,
+    addMemberValidator
 };

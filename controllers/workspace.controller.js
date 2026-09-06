@@ -3,7 +3,8 @@ const {
     getUserWorkspaces,
     getWorkspaceById,
     updateWorkspace,
-    deleteWorkspace
+    deleteWorkspace,
+    addWorkspaceMember
 } = require("../services/workspace.service");
 
 const create = async (req, res, next) => {
@@ -129,10 +130,35 @@ const remove = async (req, res, next) => {
     }
 };
 
+const addMember = async (req, res, next) => {
+    try {
+        const { email, role } = req.body;
+
+        const membership = await addWorkspaceMember({
+            workspaceId: req.params.id,
+            email,
+            role
+        });
+
+        res.status(201).json({
+            message: "Member added successfully",
+            member: {
+                id: membership.id,
+                workspace_id: membership.workspace_id,
+                user_id: membership.user_id,
+                role: membership.role
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     create,
     getAll,
     getOne,
     update,
-    remove
+    remove,
+    addMember
 };
