@@ -157,11 +157,29 @@ const addWorkspaceMember = async ({
     return membership;
 };
 
+const getWorkspaceMembers = async (workspaceId) => {
+    const memberships = await WorkspaceMember.findAll({
+        where: {
+            workspace_id: workspaceId
+        },
+        include: [
+            {
+                association: "user",
+                attributes: ["id", "name", "email", "profile_image", "status"]
+            }
+        ],
+        order: [["joined_at", "ASC"]]
+    });
+
+    return memberships;
+};
+
 module.exports = {
     createWorkspace,
     getUserWorkspaces,
     getWorkspaceById,
     updateWorkspace,
     deleteWorkspace,
-    addWorkspaceMember
+    addWorkspaceMember,
+    getWorkspaceMembers
 };

@@ -1,11 +1,12 @@
 const express = require("express");
 const authenticate = require("../middleware/auth.middleware");
 const validate = require("../middleware/validation.middleware");
-const { create, getAll, getOne, update,remove,addMember } = require("../controllers/workspace.controller");
+const { create, getAll, getOne, update,remove,addMember,getMembers } = require("../controllers/workspace.controller");
 const { createWorkspaceValidator, updateWorkspaceValidator,addMemberValidator } = require("../validators/workspace.validator");
 const {
     requireWorkspaceAdmin,
-    requireWorkspaceOwner
+    requireWorkspaceOwner,
+    requireWorkspaceMember
 } = require("../middleware/workspace.middleware");
 
 
@@ -20,6 +21,13 @@ router.post(
 );
 
 router.get("/", authenticate, getAll);
+
+router.get(
+    "/:id/members",
+    authenticate,
+    requireWorkspaceMember,
+    getMembers
+);
 
 router.get("/:id", authenticate, getOne);
 
@@ -47,5 +55,7 @@ router.post(
     validate,
     addMember
 );
+
+
 
 module.exports = router;
