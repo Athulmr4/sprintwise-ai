@@ -174,6 +174,111 @@ const getWorkspaceMembers = async (workspaceId) => {
     return memberships;
 };
 
+const updateWorkspaceMemberRole = async ({
+    workspaceId,
+    userId,
+    role,
+    requestingUserId
+}) => {
+    const requestingMembership = await WorkspaceMember.findOne({
+        where: {
+            workspace_id: workspaceId,
+            user_id: requestingUserId
+        }
+    });
+
+    if (!requestingMembership) {
+        throw new AppError("Workspace not found", 404);
+    }
+
+    if (requestingMembership.role !== "owner") {
+        throw new AppError(
+            "Only the workspace owner can change member roles",
+            403
+        );
+    }
+
+    const membership = await WorkspaceMember.findOne({
+        where: {
+            workspace_id: workspaceId,
+            user_id: userId
+        }
+    });
+
+    if (!membership) {
+        throw new AppError("Workspace member not found", 404);
+    }
+
+    if (membership.role === "owner") {
+        throw new AppError(
+            "The workspace owner's role cannot be changed",
+            403
+        );
+    }
+
+    membership.role = role;
+
+    await membership.save();
+
+    return membership;
+};
+
+const removeWorkspaceMember = async ({
+    workspaceId,
+    userId,
+    requestingUserId
+}) => {
+    const membership = await WorkspaceMember.findOne({
+        where: {
+            workspace_id: workspaceId,
+            user_id: userId
+        }
+    });
+
+    if (!membership) {
+        throw new AppError("Workspace member not found", 404);
+    }
+
+    if (membership.role === "owner") {
+        throw new AppError(
+            "The workspace owner cannot be removed",
+            403
+        );
+    }
+
+    if (Number(userId) === Number(requestingUserId)) {
+        throw new AppError(
+            "You cannot remove yourself from the workspace",
+            403
+        );
+    }
+
+    const requestingMembership = await WorkspaceMember.findOne({
+        where: {
+            workspace_id: workspaceId,
+            user_id: requestingUserId
+        }
+    });
+
+    if (!requestingMembership) {
+        throw new AppError("Workspace not found", 404);
+    }
+
+    if (
+        requestingMembership.role === "admin" &&
+        membership.role === "admin"
+    ) {
+        throw new AppError(
+            "Admins cannot remove other admins",
+            403
+        );
+    }
+
+    await membership.destroy();
+
+    return membership;
+};
+
 module.exports = {
     createWorkspace,
     getUserWorkspaces,
@@ -181,5 +286,7 @@ module.exports = {
     updateWorkspace,
     deleteWorkspace,
     addWorkspaceMember,
-    getWorkspaceMembers
+    getWorkspaceMembers,
+    updateWorkspaceMemberRole,
+    removeWorkspaceMember
 };

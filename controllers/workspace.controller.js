@@ -5,7 +5,9 @@ const {
     updateWorkspace,
     deleteWorkspace,
     addWorkspaceMember,
-    getWorkspaceMembers
+    getWorkspaceMembers,
+    updateWorkspaceMemberRole,
+    removeWorkspaceMember
 } = require("../services/workspace.service");
 
 const create = async (req, res, next) => {
@@ -175,6 +177,51 @@ const getMembers = async (req, res, next) => {
     }
 };
 
+const updateMemberRole = async (req, res, next) => {
+    try {
+        const { role } = req.body;
+
+        const membership = await updateWorkspaceMemberRole({
+        workspaceId: req.params.id,
+        userId: req.params.userId,
+        role,
+        requestingUserId: req.user.id
+    });
+
+        return res.status(200).json({
+            message: "Member role updated successfully",
+            member: {
+                id: membership.user_id,
+                workspace_id: membership.workspace_id,
+                role: membership.role,
+                joined_at: membership.joined_at
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+const removeMember = async (req, res, next) => {
+    try {
+        const membership = await removeWorkspaceMember({
+            workspaceId: req.params.id,
+            userId: req.params.userId,
+            requestingUserId: req.user.id
+        });
+
+        return res.status(200).json({
+            message: "Workspace member removed successfully",
+            member: {
+                id: membership.user_id,
+                workspace_id: membership.workspace_id,
+                role: membership.role
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     create,
     getAll,
@@ -182,5 +229,7 @@ module.exports = {
     update,
     remove,
     addMember,
-    getMembers
+    getMembers,
+    updateMemberRole,
+    removeMember
 };

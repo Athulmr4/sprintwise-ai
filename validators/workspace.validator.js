@@ -46,8 +46,17 @@ const addMemberValidator = [
         .withMessage("Role must be either admin or member")
 ];
 
+const updateMemberRoleValidator = [
+    body("role")
+        .notEmpty()
+        .withMessage("Role is required")
+        .isIn(["admin", "member"])
+        .withMessage("Role must be either admin or member")
+];
+
 module.exports = {
     createWorkspaceValidator,
     updateWorkspaceValidator,
-    addMemberValidator
+    addMemberValidator,
+    updateMemberRoleValidator
 };
