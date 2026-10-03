@@ -279,6 +279,30 @@ const removeWorkspaceMember = async ({
     return membership;
 };
 
+const leaveWorkspace = async ({ workspaceId, userId }) => {
+    const membership = await WorkspaceMember.findOne({
+        where: {
+            workspace_id: workspaceId,
+            user_id: userId
+        }
+    });
+
+    if (!membership) {
+        throw new AppError("Workspace not found", 404);
+    }
+
+    if (membership.role === "owner") {
+        throw new AppError(
+            "The workspace owner cannot leave the workspace. Transfer ownership first.",
+            403
+        );
+    }
+
+    await membership.destroy();
+
+    return membership;
+};
+
 module.exports = {
     createWorkspace,
     getUserWorkspaces,
@@ -288,5 +312,6 @@ module.exports = {
     addWorkspaceMember,
     getWorkspaceMembers,
     updateWorkspaceMemberRole,
-    removeWorkspaceMember
+    removeWorkspaceMember,
+    leaveWorkspace
 };

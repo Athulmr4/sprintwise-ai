@@ -9,7 +9,9 @@ const { create,
     addMember,
     getMembers,
     updateMemberRole,
-    removeMember } = require("../controllers/workspace.controller");
+    removeMember,
+    leave } = require("../controllers/workspace.controller");
+    
 const { createWorkspaceValidator, 
     updateWorkspaceValidator,
     addMemberValidator,
@@ -33,6 +35,12 @@ router.post(
 );
 
 router.get("/", authenticate, getAll);
+
+router.delete(
+    "/:id/leave",
+    authenticate,
+    leave
+);
 
 router.get(
     "/:id/members",

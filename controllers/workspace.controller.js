@@ -7,7 +7,8 @@ const {
     addWorkspaceMember,
     getWorkspaceMembers,
     updateWorkspaceMemberRole,
-    removeWorkspaceMember
+    removeWorkspaceMember,
+    leaveWorkspace
 } = require("../services/workspace.service");
 
 const create = async (req, res, next) => {
@@ -222,6 +223,21 @@ const removeMember = async (req, res, next) => {
     }
 };
 
+const leave = async (req, res, next) => {
+    try {
+        await leaveWorkspace({
+            workspaceId: req.params.id,
+            userId: req.user.id
+        });
+
+        return res.status(200).json({
+            message: "You have left the workspace successfully"
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     create,
     getAll,
@@ -231,5 +247,6 @@ module.exports = {
     addMember,
     getMembers,
     updateMemberRole,
-    removeMember
+    removeMember,
+    leave 
 };
