@@ -2,6 +2,7 @@ const sequelize = require("../config/db");
 const User = require("./user");
 const Workspace = require("./workspace");
 const WorkspaceMember = require("./workspaceMember");
+const Project = require("./project");
 
 // User owns workspaces
 User.hasMany(Workspace, {
@@ -35,11 +36,22 @@ WorkspaceMember.belongsTo(Workspace, {
     as: "workspace"
 });
 
+Workspace.hasMany(Project, {
+    foreignKey: "workspace_id",
+    as: "projects"
+});
+
+Project.belongsTo(Workspace, {
+    foreignKey: "workspace_id",
+    as: "workspace"
+});
+
 const db = {
     sequelize,
     User,
     Workspace,
-    WorkspaceMember
+    WorkspaceMember,
+    Project 
 };
 
 module.exports = db;
