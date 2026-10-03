@@ -54,9 +54,18 @@ const updateMemberRoleValidator = [
         .withMessage("Role must be either admin or member")
 ];
 
+const transferOwnershipValidator = [
+    body("userId")
+        .notEmpty()
+        .withMessage("New owner user ID is required")
+        .isInt({ min: 1 })
+        .withMessage("New owner user ID must be a valid user ID")
+];
+
 module.exports = {
     createWorkspaceValidator,
     updateWorkspaceValidator,
     addMemberValidator,
-    updateMemberRoleValidator
+    updateMemberRoleValidator,
+    transferOwnershipValidator
 };

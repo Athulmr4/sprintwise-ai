@@ -10,12 +10,14 @@ const { create,
     getMembers,
     updateMemberRole,
     removeMember,
-    leave } = require("../controllers/workspace.controller");
-    
+    leave,
+    transferOwnership } = require("../controllers/workspace.controller");
+
 const { createWorkspaceValidator, 
     updateWorkspaceValidator,
     addMemberValidator,
-    updateMemberRoleValidator } = require("../validators/workspace.validator");
+    updateMemberRoleValidator,
+    transferOwnershipValidator } = require("../validators/workspace.validator");
 const {
     requireWorkspaceAdmin,
     requireWorkspaceOwner,
@@ -42,6 +44,14 @@ router.delete(
     leave
 );
 
+router.patch(
+    "/:id/transfer-ownership",
+    authenticate,
+    transferOwnershipValidator,
+    validate,
+    transferOwnership
+);
+
 router.get(
     "/:id/members",
     authenticate,
@@ -54,7 +64,6 @@ router.get("/:id", authenticate, getOne);
 router.patch(
     "/:id/members/:userId",
     authenticate,
-    requireWorkspaceOwnerForRoleChange,
     updateMemberRoleValidator,
     validate,
     updateMemberRole

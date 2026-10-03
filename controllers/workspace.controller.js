@@ -8,7 +8,8 @@ const {
     getWorkspaceMembers,
     updateWorkspaceMemberRole,
     removeWorkspaceMember,
-    leaveWorkspace
+    leaveWorkspace,
+    transferWorkspaceOwnership
 } = require("../services/workspace.service");
 
 const create = async (req, res, next) => {
@@ -238,6 +239,32 @@ const leave = async (req, res, next) => {
     }
 };
 
+const transferOwnership = async (req, res, next) => {
+    try {
+        const { userId } = req.body;
+
+        const result = await transferWorkspaceOwnership({
+            workspaceId: req.params.id,
+            currentOwnerId: req.user.id,
+            newOwnerId: userId
+        });
+
+        return res.status(200).json({
+            message: "Workspace ownership transferred successfully",
+            previousOwner: {
+                id: result.previousOwner.user_id,
+                role: result.previousOwner.role
+            },
+            newOwner: {
+                id: result.newOwner.user_id,
+                role: result.newOwner.role
+            }
+        });
+    } catch (error) {
+        next(error);
+    }
+};
+
 module.exports = {
     create,
     getAll,
@@ -248,5 +275,6 @@ module.exports = {
     getMembers,
     updateMemberRole,
     removeMember,
-    leave 
+    leave,
+    transferOwnership
 };

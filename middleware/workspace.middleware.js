@@ -78,37 +78,11 @@ const requireWorkspaceMember = async (req, res, next) => {
     }
 };
 
-const requireWorkspaceOwnerForRoleChange = async (req, res, next) => {
-    try {
-        const membership = await WorkspaceMember.findOne({
-            where: {
-                workspace_id: req.params.id,
-                user_id: req.user.id
-            }
-        });
 
-        if (!membership) {
-            throw new AppError("Workspace not found", 404);
-        }
 
-        if (membership.role !== "owner") {
-            throw new AppError(
-                "Only the workspace owner can change member roles",
-                403
-            );
-        }
-
-        req.workspaceMembership = membership;
-
-        next();
-    } catch (error) {
-        next(error);
-    }
-};
 
 module.exports = {
     requireWorkspaceAdmin,
     requireWorkspaceOwner,
-    requireWorkspaceMember,
-    requireWorkspaceOwnerForRoleChange 
+    requireWorkspaceMember
 };

@@ -303,6 +303,75 @@ const leaveWorkspace = async ({ workspaceId, userId }) => {
     return membership;
 };
 
+const transferWorkspaceOwnership = async ({
+    workspaceId,
+    currentOwnerId,
+    newOwnerId
+}) => {
+    const transaction = await Workspace.sequelize.transaction();
+
+    try {
+        // Verify current owner
+        const currentOwner = await WorkspaceMember.findOne({
+            where: {
+                workspace_id: workspaceId,
+                user_id: currentOwnerId,
+                role: "owner"
+            },
+            transaction
+        });
+
+        if (!currentOwner) {
+            throw new AppError(
+                "Only the workspace owner can transfer ownership",
+                403
+            );
+        }
+
+        // Verify target user is a workspace member
+        const newOwner = await WorkspaceMember.findOne({
+            where: {
+                workspace_id: workspaceId,
+                user_id: newOwnerId
+            },
+            transaction
+        });
+
+        if (!newOwner) {
+            throw new AppError(
+                "The new owner must be a member of the workspace",
+                400
+            );
+        }
+
+        // Prevent transferring to yourself
+        if (Number(currentOwnerId) === Number(newOwnerId)) {
+            throw new AppError(
+                "You are already the workspace owner",
+                400
+            );
+        }
+
+        // New owner gets owner role
+        newOwner.role = "owner";
+        await newOwner.save({ transaction });
+
+        // Previous owner becomes admin
+        currentOwner.role = "admin";
+        await currentOwner.save({ transaction });
+
+        await transaction.commit();
+
+        return {
+            previousOwner: currentOwner,
+            newOwner
+        };
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
+};
+
 module.exports = {
     createWorkspace,
     getUserWorkspaces,
@@ -313,5 +382,6 @@ module.exports = {
     getWorkspaceMembers,
     updateWorkspaceMemberRole,
     removeWorkspaceMember,
-    leaveWorkspace
+    leaveWorkspace,
+    transferWorkspaceOwnership
 };
