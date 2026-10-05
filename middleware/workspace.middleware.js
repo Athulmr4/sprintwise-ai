@@ -1,11 +1,39 @@
 const { WorkspaceMember } = require("../models");
 const AppError = require("../utils/appError");
 
-const requireWorkspaceAdmin = async (req, res, next) => {
+const getWorkspaceId = (req) => {
+    return req.params.workspaceId || req.params.id;
+};
+
+const requireWorkspaceMember = async (req, res, next) => {
     try {
+        const workspaceId = getWorkspaceId(req);
+
         const membership = await WorkspaceMember.findOne({
             where: {
-                workspace_id: req.params.id,
+                workspace_id: workspaceId,
+                user_id: req.user.id
+            }
+        });
+
+        if (!membership) {
+            throw new AppError("Workspace not found", 404);
+        }
+
+        req.workspaceMembership = membership;
+        next();
+    } catch (error) {
+        next(error);
+    }
+};
+
+const requireWorkspaceAdmin = async (req, res, next) => {
+    try {
+        const workspaceId = getWorkspaceId(req);
+
+        const membership = await WorkspaceMember.findOne({
+            where: {
+                workspace_id: workspaceId,
                 user_id: req.user.id
             }
         });
@@ -22,7 +50,6 @@ const requireWorkspaceAdmin = async (req, res, next) => {
         }
 
         req.workspaceMembership = membership;
-
         next();
     } catch (error) {
         next(error);
@@ -31,9 +58,11 @@ const requireWorkspaceAdmin = async (req, res, next) => {
 
 const requireWorkspaceOwner = async (req, res, next) => {
     try {
+        const workspaceId = getWorkspaceId(req);
+
         const membership = await WorkspaceMember.findOne({
             where: {
-                workspace_id: req.params.id,
+                workspace_id: workspaceId,
                 user_id: req.user.id
             }
         });
@@ -50,39 +79,14 @@ const requireWorkspaceOwner = async (req, res, next) => {
         }
 
         req.workspaceMembership = membership;
-
         next();
     } catch (error) {
         next(error);
     }
 };
-
-const requireWorkspaceMember = async (req, res, next) => {
-    try {
-        const membership = await WorkspaceMember.findOne({
-            where: {
-                workspace_id: req.params.id,
-                user_id: req.user.id
-            }
-        });
-
-        if (!membership) {
-            throw new AppError("Workspace not found", 404);
-        }
-
-        req.workspaceMembership = membership;
-
-        next();
-    } catch (error) {
-        next(error);
-    }
-};
-
-
-
 
 module.exports = {
+    requireWorkspaceMember,
     requireWorkspaceAdmin,
-    requireWorkspaceOwner,
-    requireWorkspaceMember
+    requireWorkspaceOwner
 };
