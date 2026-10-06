@@ -1,25 +1,48 @@
 const {
-    Project
+    Project,
+    ProjectMember
 } = require("../models");
 
 const createProject = async ({
     workspaceId,
+    creatorId,
     name,
     description,
     status,
     start_date,
     end_date
 }) => {
-    const project = await Project.create({
-        workspace_id: workspaceId,
-        name,
-        description,
-        status,
-        start_date,
-        end_date
-    });
+    const transaction = await Project.sequelize.transaction();
 
-    return project;
+    try {
+        const project = await Project.create(
+            {
+                workspace_id: workspaceId,
+                name,
+                description,
+                status,
+                start_date,
+                end_date
+            },
+            { transaction }
+        );
+
+        await ProjectMember.create(
+            {
+                project_id: project.id,
+                user_id: creatorId,
+                role: "owner"
+            },
+            { transaction }
+        );
+
+        await transaction.commit();
+
+        return project;
+    } catch (error) {
+        await transaction.rollback();
+        throw error;
+    }
 };
 
 const getWorkspaceProjects = async (workspaceId) => {

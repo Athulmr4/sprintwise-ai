@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://localhost:3000/api/projects/1/members
+method: POST
+body:
+  type: json
+  content: |-
+    {
+        "userId": 6,
+        "role": "member"
+    }
+order: 4246691167801911

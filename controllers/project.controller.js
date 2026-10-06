@@ -18,6 +18,7 @@ const create = async (req, res, next) => {
 
         const project = await createProject({
             workspaceId: req.params.workspaceId,
+            creatorId: req.user.id,
             name,
             description,
             status,
