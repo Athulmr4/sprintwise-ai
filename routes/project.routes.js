@@ -21,6 +21,12 @@ const {
     updateProjectValidator
 } = require("../validators/project.validator");
 
+const {
+    requireProjectMember,
+    requireProjectManager,
+    requireProjectOwner
+} = require("../middleware/project.middleware");
+
 const router = express.Router();
 
 router.post(
@@ -42,12 +48,14 @@ router.get(
 router.get(
     "/projects/:id",
     authenticate,
+    requireProjectMember,
     getOne
 );
 
 router.patch(
     "/projects/:id",
     authenticate,
+    requireProjectManager,
     updateProjectValidator,
     validate,
     update
@@ -56,6 +64,7 @@ router.patch(
 router.delete(
     "/projects/:id",
     authenticate,
+    requireProjectOwner,
     remove
 );
 

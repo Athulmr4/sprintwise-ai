@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://localhost:3000/api/projects/1/transfer-ownership
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+        "userId": 2
+    }
+order: 4503521356184670

@@ -18,6 +18,11 @@ const {
     transferProjectOwnershipValidator
 } = require("../validators/projectMember.validator");
 
+const {
+    requireProjectMember,
+    requireProjectManager,
+    requireProjectOwner
+} = require("../middleware/project.middleware");
 
 const router = express.Router();
 
@@ -25,6 +30,7 @@ const router = express.Router();
 router.get(
     "/projects/:id/members",
     authenticate,
+    requireProjectMember,
     getMembers
 );
 
@@ -32,6 +38,7 @@ router.get(
 router.post(
     "/projects/:id/members",
     authenticate,
+    requireProjectManager,
     addProjectMemberValidator,
     validate,
     addMember
@@ -41,6 +48,7 @@ router.post(
 router.patch(
     "/projects/:id/members/:userId",
     authenticate,
+    requireProjectOwner,
     updateProjectMemberRoleValidator,
     validate,
     updateMemberRole
@@ -50,6 +58,7 @@ router.patch(
 router.delete(
     "/projects/:id/members/:userId",
     authenticate,
+    requireProjectManager,
     removeMember
 );
 
@@ -57,6 +66,7 @@ router.delete(
 router.delete(
     "/projects/:id/leave",
     authenticate,
+    requireProjectMember,
     leave
 );
 
@@ -64,6 +74,7 @@ router.delete(
 router.patch(
     "/projects/:id/transfer-ownership",
     authenticate,
+    requireProjectOwner,
     transferProjectOwnershipValidator,
     validate,
     transferOwnership

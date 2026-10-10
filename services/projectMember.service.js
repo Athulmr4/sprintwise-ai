@@ -123,7 +123,8 @@ const updateProjectMemberRole = async ({
 
 const removeProjectMember = async ({
     projectId,
-    userId
+    userId,
+    requestingUserId
 }) => {
     const membership = await ProjectMember.findOne({
         where: {
@@ -142,6 +143,27 @@ const removeProjectMember = async ({
     if (membership.role === "owner") {
         throw new AppError(
             "The project owner cannot be removed",
+            403
+        );
+    }
+
+    const requestingMembership = await ProjectMember.findOne({
+        where: {
+            project_id: projectId,
+            user_id: requestingUserId
+        }
+    });
+
+    if (!requestingMembership) {
+        throw new AppError("Project not found", 404);
+    }
+
+    if (
+        requestingMembership.role === "manager" &&
+        membership.role === "manager"
+    ) {
+        throw new AppError(
+            "Managers cannot remove other managers",
             403
         );
     }

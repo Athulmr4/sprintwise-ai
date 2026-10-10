@@ -1,0 +1,4 @@
+$kind: http-request
+url: http://localhost:3000/api/projects/1
+method: DELETE
+order: 3810187917019372

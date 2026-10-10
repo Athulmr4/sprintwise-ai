@@ -1,10 +1,10 @@
 $kind: http-request
-url: http://localhost:3000/api/projects/1/members/2
+url: http://localhost:3000/api/projects/1/members/4
 method: PATCH
 body:
   type: json
   content: |-
     {
-        "role": "manager"
+        "role": "user"
     }
 order: 4411212669890716

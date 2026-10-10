@@ -63,7 +63,8 @@ const removeMember = async (req, res, next) => {
     try {
         await removeProjectMember({
             projectId: req.params.id,
-            userId: req.params.userId
+            userId: req.params.userId,
+            requestingUserId: req.user.id
         });
 
         return res.status(200).json({
