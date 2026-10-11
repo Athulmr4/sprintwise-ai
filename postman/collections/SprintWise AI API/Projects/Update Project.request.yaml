@@ -5,6 +5,6 @@ body:
   type: json
   content: |-
     {
-        "description": "Updated by project manager"
+        "description": "This should not be allowed"
     }
 order: 2116054275481043

@@ -4,6 +4,7 @@ const Workspace = require("./workspace");
 const WorkspaceMember = require("./workspaceMember");
 const Project = require("./project");
 const ProjectMember = require("./projectMember");
+const Task = require("./task")(sequelize);
 
 // User owns workspaces
 User.hasMany(Workspace, {
@@ -67,13 +68,54 @@ ProjectMember.belongsTo(User, {
     as: "user"
 });
 
+Project.hasMany(Task, {
+    foreignKey: "project_id",
+    as: "tasks"
+});
+
+Task.belongsTo(Project, {
+    foreignKey: "project_id",
+    as: "project"
+});
+
+User.hasMany(Task, {
+    foreignKey: "assigned_to",
+    as: "assignedTasks"
+});
+
+Task.belongsTo(User, {
+    foreignKey: "assigned_to",
+    as: "assignee"
+});
+
+User.hasMany(Task, {
+    foreignKey: "created_by",
+    as: "createdTasks"
+});
+
+Task.belongsTo(User, {
+    foreignKey: "created_by",
+    as: "creator"
+});
+
+Task.belongsTo(Task, {
+    foreignKey: "parent_task_id",
+    as: "parentTask"
+});
+
+Task.hasMany(Task, {
+    foreignKey: "parent_task_id",
+    as: "subtasks"
+});
+
 const db = {
     sequelize,
     User,
     Workspace,
     WorkspaceMember,
     Project,
-    ProjectMember
+    ProjectMember,
+    Task 
 };
 
 module.exports = db;
