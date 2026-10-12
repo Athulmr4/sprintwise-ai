@@ -3,3 +3,7 @@ node_modules/
 uploads/*
 logs/*
 .DS_Store
+
+# Local cookie exports
+cookies.txt
+*-cookies.txt

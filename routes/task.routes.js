@@ -6,8 +6,7 @@ const router = express.Router();
 
 const authenticate = require("../middleware/auth.middleware");
 const {
-    requireProjectMember,
-    requireProjectManager
+    requireProjectMember
 } = require("../middleware/project.middleware");
 
 const validate = require("../middleware/validation.middleware");
@@ -29,9 +28,9 @@ const taskController = require("../controllers/task.controller");
 router.post(
     "/projects/:projectId/tasks",
     authenticate,
-    requireProjectMember,
     projectIdValidator,
     validate,
+    requireProjectMember,
     createTaskValidator,
     validate,
     taskController.createTask
@@ -41,9 +40,9 @@ router.post(
 router.get(
     "/projects/:projectId/tasks",
     authenticate,
-    requireProjectMember,
     projectIdValidator,
     validate,
+    requireProjectMember,
     taskController.getProjectTasks
 );
 
