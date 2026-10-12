@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://localhost:3000/api/projects/1/tasks
+method: POST
+body:
+  type: json
+  content: |-
+    {
+      "title": "Temporary task for deletion test"
+    }
+order: 1791794916908

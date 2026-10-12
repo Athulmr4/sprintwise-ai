@@ -4,6 +4,7 @@ const userRoutes = require("./routes/user.routes");
 const workspaceRoutes = require("./routes/workspace.routes");
 const projectRoutes = require("./routes/project.routes");
 const projectMemberRoutes = require("./routes/projectMember.routes");
+const taskRoutes = require("./routes/task.routes");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 
@@ -21,6 +22,7 @@ app.use("/api/user", userRoutes);
 app.use("/api/workspaces", workspaceRoutes);
 app.use("/api", projectRoutes);
 app.use("/api", projectMemberRoutes);
+app.use("/api", taskRoutes);
 app.use(express.static("public"));
 app.use(errorHandler);
 

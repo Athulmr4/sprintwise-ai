@@ -2,7 +2,8 @@ const { Project, ProjectMember } = require("../models");
 const AppError = require("../utils/appError");
 
 const loadProjectMembership = async (req) => {
-    const project = await Project.findByPk(req.params.id);
+    const projectId = req.params.projectId || req.params.id;
+    const project = await Project.findByPk(projectId);
 
     if (!project) {
         throw new AppError("Project not found", 404);

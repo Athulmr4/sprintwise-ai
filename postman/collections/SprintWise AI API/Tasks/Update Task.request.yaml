@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://localhost:3000/api/tasks/1
+method: PATCH
+body:
+  type: json
+  content: |-
+    {
+      "assigned_to": 5
+    }
+order: 4493850252310427
