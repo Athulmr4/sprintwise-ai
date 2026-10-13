@@ -1,4 +1,5 @@
 const errorHandler = require("./middleware/error.middleware");
+const authenticatePage = require("./middleware/pageAuth.middleware");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const workspaceRoutes = require("./routes/workspace.routes");
@@ -26,6 +27,15 @@ app.use("/api", projectMemberRoutes);
 app.use("/api", taskRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use(express.static("public"));
+
+app.get("/login", (req, res) => {
+    res.render("login", { title: "Sign In | SprintWise AI" });
+});
+
+app.get("/dashboard", authenticatePage, (req, res) => {
+    res.render("dashboard", { title: "Dashboard | SprintWise AI" });
+});
+
 app.use(errorHandler);
 
 app.get("/", (req, res) => {
