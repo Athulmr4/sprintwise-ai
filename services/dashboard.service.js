@@ -105,4 +105,74 @@ const getDashboardSummary = async (userId) => {
     };
 };
 
-module.exports = { getDashboardSummary };
+
+const getRecentProjects = async (userId) => {
+    // Find projects that this user is a member of.
+    const memberships = await ProjectMember.findAll({
+        attributes: ["project_id"],
+        where: { user_id: userId },
+        raw: true
+    });
+
+    const projectIds = [
+        ...new Set(memberships.map((item) => item.project_id))
+    ];
+
+    // Return an empty list if the user has no projects.
+    if (projectIds.length === 0) {
+        return [];
+    }
+
+    // Fetch the six most recently created projects and their tasks.
+    const projects = await Project.findAll({
+        where: {
+            id: { [Op.in]: projectIds }
+        },
+        attributes: [
+            "id",
+            "name",
+            "description",
+            "status",
+            "start_date",
+            "end_date",
+            "created_at"
+        ],
+        include: [
+            {
+                model: Task,
+                as: "tasks",
+                attributes: ["id", "status"]
+            }
+        ],
+        order: [["created_at", "DESC"]],
+        limit: 6
+    });
+
+    // Calculate task counts and completion percentage per project.
+    return projects.map((project) => {
+        const tasks = project.tasks || [];
+        const totalTasks = tasks.length;
+        const completedTasks = tasks.filter(
+            (task) => task.status === "completed"
+        ).length;
+
+        const completionRate = totalTasks === 0
+            ? 0
+            : Math.round((completedTasks / totalTasks) * 100);
+
+        return {
+            id: project.id,
+            name: project.name,
+            description: project.description,
+            status: project.status,
+            start_date: project.start_date,
+            end_date: project.end_date,
+            totalTasks,
+            completedTasks,
+            completionRate
+        };
+    });
+};
+
+
+module.exports = { getDashboardSummary, getRecentProjects};

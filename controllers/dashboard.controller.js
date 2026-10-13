@@ -29,4 +29,18 @@ const getTaskAnalytics = async (req, res, next) => {
 };
 
 
-module.exports = { getSummary, getTaskAnalytics };
+const getRecentProjects = async (req, res, next) => {
+    try {
+        const projects = await dashboardService.getRecentProjects(
+            req.user.id
+        );
+
+        return res.status(200).json({ projects });
+    } catch (error) {
+        next(error);
+    }
+};
+
+
+
+module.exports = { getSummary, getTaskAnalytics, getRecentProjects};

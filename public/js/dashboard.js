@@ -161,4 +161,96 @@ document.getElementById("logout-button").addEventListener("click", async () => {
     }
 });
 
+
+const loadRecentProjects = async () => {
+    const container = document.getElementById("recent-projects");
+    const projectsMessage = document.getElementById("projects-message");
+
+    projectsMessage.textContent = "Loading projects...";
+    container.replaceChildren();
+
+    try {
+        const data = await fetchJson("/api/dashboard/recent-projects");
+        const projects = data.projects;
+
+        if (projects.length === 0) {
+            projectsMessage.textContent =
+                "No projects yet. Create a project to see it here.";
+            return;
+        }
+
+        projectsMessage.textContent = `${projects.length} recent project(s)`;
+
+        const statusStyles = {
+            planned: "bg-slate-700 text-slate-200",
+            active: "bg-indigo-500/20 text-indigo-300",
+            completed: "bg-emerald-500/20 text-emerald-300",
+            archived: "bg-amber-500/20 text-amber-300"
+        };
+
+        projects.forEach((project) => {
+            const card = document.createElement("article");
+            card.className =
+                "rounded-xl border border-slate-800 bg-slate-900 p-5";
+
+            const heading = document.createElement("h3");
+            heading.className = "text-lg font-semibold";
+            heading.textContent = project.name;
+
+            const status = document.createElement("span");
+            status.className =
+                `mt-3 inline-block rounded-full px-3 py-1 text-xs font-medium ${
+                    statusStyles[project.status] ||
+                    "bg-slate-700 text-slate-200"
+                }`;
+            status.textContent = project.status.replace("_", " ");
+
+            const taskCount = document.createElement("p");
+            taskCount.className = "mt-5 text-sm text-slate-400";
+            taskCount.textContent =
+                `${project.completedTasks} of ${project.totalTasks} tasks completed`;
+
+            const progressHeader = document.createElement("div");
+            progressHeader.className =
+                "mt-4 flex justify-between text-sm";
+
+            const progressLabel = document.createElement("span");
+            progressLabel.className = "text-slate-400";
+            progressLabel.textContent = "Progress";
+
+            const percentage = document.createElement("span");
+            percentage.className = "font-medium";
+            percentage.textContent = `${project.completionRate}%`;
+
+            progressHeader.append(progressLabel, percentage);
+
+            const progressTrack = document.createElement("div");
+            progressTrack.className =
+                "mt-2 h-2 overflow-hidden rounded-full bg-slate-800";
+            progressTrack.setAttribute("role", "progressbar");
+            progressTrack.setAttribute("aria-label", `${project.name} progress`);
+            progressTrack.setAttribute("aria-valuemin", "0");
+            progressTrack.setAttribute("aria-valuemax", "100");
+            progressTrack.setAttribute(
+                "aria-valuenow",
+                String(project.completionRate)
+            );
+
+            const progressBar = document.createElement("div");
+            progressBar.className =
+                "h-full rounded-full bg-indigo-500 transition-all";
+            progressBar.style.width = `${project.completionRate}%`;
+
+            progressTrack.appendChild(progressBar);
+            card.append(heading, status, taskCount, progressHeader, progressTrack);
+            container.appendChild(card);
+        });
+    } catch (error) {
+        projectsMessage.textContent = error.message;
+    }
+};
+
+loadRecentProjects();
+
+
 loadDashboard();

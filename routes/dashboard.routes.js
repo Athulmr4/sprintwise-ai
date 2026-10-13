@@ -19,4 +19,10 @@ router.get(
     dashboardController.getTaskAnalytics
 );
 
+router.get(
+    "/recent-projects",
+    authenticate,
+    dashboardController.getRecentProjects
+);
+
 module.exports = router;
