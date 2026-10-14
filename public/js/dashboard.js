@@ -205,6 +205,32 @@ const loadRecentProjects = async () => {
                 }`;
             status.textContent = project.status.replace("_", " ");
 
+
+            const deadline = document.createElement("p");
+            deadline.className = "mt-3 text-sm";
+
+            if (!project.end_date) {
+                deadline.classList.add("text-slate-400");
+                deadline.textContent = "No deadline set";
+            } else if (project.isOverdue) {
+                deadline.classList.add("font-medium", "text-red-400");
+                const daysOverdue = Math.abs(project.daysRemaining);
+                deadline.textContent =
+                    `Overdue by ${daysOverdue} day${daysOverdue === 1 ? "" : "s"}`;
+            } else if (project.daysRemaining === 0) {
+                deadline.classList.add("font-medium", "text-amber-400");
+                deadline.textContent = "Due today";
+            } else if (project.daysRemaining <= 3) {
+                deadline.classList.add("font-medium", "text-amber-400");
+                deadline.textContent =
+                    `Due in ${project.daysRemaining} days`;
+            } else {
+                deadline.classList.add("text-slate-400");
+                deadline.textContent =
+                    `Due ${project.end_date} · ${project.daysRemaining} days remaining`;
+            }
+
+
             const taskCount = document.createElement("p");
             taskCount.className = "mt-5 text-sm text-slate-400";
             taskCount.textContent =
@@ -242,7 +268,7 @@ const loadRecentProjects = async () => {
             progressBar.style.width = `${project.completionRate}%`;
 
             progressTrack.appendChild(progressBar);
-            card.append(heading, status, taskCount, progressHeader, progressTrack);
+            card.append(heading, status, deadline, taskCount, progressHeader, progressTrack);
             container.appendChild(card);
         });
     } catch (error) {

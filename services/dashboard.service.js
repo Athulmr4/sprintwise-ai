@@ -149,9 +149,14 @@ const getRecentProjects = async (userId) => {
     });
 
     // Calculate task counts and completion percentage per project.
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
     return projects.map((project) => {
         const tasks = project.tasks || [];
         const totalTasks = tasks.length;
+
         const completedTasks = tasks.filter(
             (task) => task.status === "completed"
         ).length;
@@ -159,6 +164,24 @@ const getRecentProjects = async (userId) => {
         const completionRate = totalTasks === 0
             ? 0
             : Math.round((completedTasks / totalTasks) * 100);
+
+        let daysRemaining = null;
+        let isOverdue = false;
+
+        if (project.end_date) {
+            // Compare date-only values to avoid timezone differences.
+            const deadline = new Date(`${project.end_date}T00:00:00`);
+            const millisecondsPerDay = 24 * 60 * 60 * 1000;
+
+            daysRemaining = Math.round(
+                (deadline.getTime() - today.getTime()) /
+                millisecondsPerDay
+            );
+
+            isOverdue =
+                daysRemaining < 0 &&
+                !["completed", "archived"].includes(project.status);
+        }
 
         return {
             id: project.id,
@@ -169,9 +192,12 @@ const getRecentProjects = async (userId) => {
             end_date: project.end_date,
             totalTasks,
             completedTasks,
-            completionRate
+            completionRate,
+            daysRemaining,
+            isOverdue
         };
     });
+
 };
 
 
